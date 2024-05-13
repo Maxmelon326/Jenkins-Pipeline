@@ -1,54 +1,83 @@
-pipeline {
-    agent any
-
-    stages {
+pipeline{
+  agent any
+  stages {
         stage('Build') {
             steps {
-                echo "Building the code using Maven"
-            }
-
-        post{
-                success{
-                    mail to: "maxmelon326@gmail.com",
-                    subject:"Build Status Email",
-                    body:"Build was sucessful!"
-                }     
+                echo "Build the code using Maven"
             }
         }
         stage('Unit and Integration Tests') {
             steps {
-                echo "Running unit and integration tests using JUnit and Mockito"
+                echo "Run unit tests using JUnit"
+                echo "Run integration tests using Selenium"
             }
+
+            post{
+                success{
+                    emailext(
+                      subject: 'Unit and Integration Tests',
+                      to: 'maxmelon326@gmail.com',
+                      body: 'Unit and Integration Tests successfuly completed', 
+                      attachLog: true
+                    )   
+                }
+                failure{
+                    emailext(
+                      subject: 'Unit and Integration Tests',
+                      to: 'maxmelon326@gmail.com',
+                      body: 'Unit and Integration Tests Failed. Check logs', 
+                      attachLog: true
+                    )   
+                }
+            }
+
         }
+
+        
         stage('Code Analysis') {
             steps {
-                echo "Analysing the code using SonarQube"
+                echo "Integrate a code analysis tool to analyse the code using SonarQube"
             }
         }
         stage('Security Scan') {
             steps {
-                echo "Performing security scan using OWASP Dependency-Check"
+                echo "Perform a security scan on the code using OWASP Dependency-Check"
+                }
+
+            post{
+                success{
+                    emailext(
+                      subject: 'Security Scan',
+                      to: 'maxmelon326@gmail.com',
+                      body: 'Security Scan Tests successfuly completed', 
+                      attachLog: true
+                    )   
+                }
+                failure{
+                    emailext(
+                      subject: 'Security Scan',
+                      to: 'maxmelon326@gmail.com',
+                      body: 'Security Scan Tests successfuly completed', 
+                      attachLog: true
+                    )   
+                }
             }
-        }
+            }
+            
         stage('Deploy to Staging') {
             steps {
-                echo "Deploying the application to a staging server (AWS EC2 instance)"
+                echo "deploy the application to Azure Virtual Machines"
             }
         }
         stage('Integration Tests on Staging') {
             steps {
-                echo "Running integration tests on the staging environment using Postman"
+                echo "Run integration tests on the staging environment"
             }
         }
         stage('Deploy to Production') {
             steps {
-                echo "Deploying the application to a production server (AWS EC2 instance)"
-            }
+                echo "deploy the application to a production server Azure Virtual Machines"
         }
     }
 }
-
-
-
-
-
+}
